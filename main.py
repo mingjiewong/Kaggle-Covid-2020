@@ -13,6 +13,7 @@ if __name__ == '__main__':
     ### Configure file names and device
     train_data_filename = './datasets/stanford-covid-vaccine/train.json'
     test_data_filename = './datasets/stanford-covid-vaccine/test.json'
+    bpps_dirname = './datasets/stanford-covid-vaccine/bpps/'
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     ### Load and preprocess training data and test data to feed into denoising Auto Encoder (AE) model
@@ -25,19 +26,19 @@ if __name__ == '__main__':
     create_loader = CreateLoader()
     structure_adj0 = create_loader.get_structure_adj(denoised_train_data)
     distance_matrix0 = create_loader.get_distance_matrix(structure_adj0.shape[1])
-    dataset0 = VacDataset(features_tensor, denoised_train_data, structure_adj0, distance_matrix0, None)
+    dataset0 = VacDataset(features_tensor, denoised_train_data, structure_adj0, distance_matrix0, bpps_dirname, None)
     features, _ = load.preprocess(public_df, True)
     features_tensor = torch.from_numpy(features)
 
     structure_adj1 = create_loader.get_structure_adj(public_df)
     distance_matrix1 = create_loader.get_distance_matrix(structure_adj1.shape[1])
-    dataset1 = VacDataset(features_tensor, public_df, structure_adj1, distance_matrix1, None)
+    dataset1 = VacDataset(features_tensor, public_df, structure_adj1, distance_matrix1, bpps_dirname, None)
     features, _ = load.preprocess(private_df, True)
     features_tensor = torch.from_numpy(features)
 
     structure_adj2 = create_loader.get_structure_adj(private_df)
     distance_matrix2 = create_loader.get_distance_matrix(structure_adj2.shape[1])
-    dataset2 = VacDataset(features_tensor, private_df, structure_adj2, distance_matrix2, None)
+    dataset2 = VacDataset(features_tensor, private_df, structure_adj2, distance_matrix2, bpps_dirname, None)
 
     loader0 = torch.utils.data.DataLoader(dataset0, batch_size=64, shuffle=False, drop_last=False)
     loader1 = torch.utils.data.DataLoader(dataset1, batch_size=64, shuffle=False, drop_last=False)
@@ -80,7 +81,7 @@ if __name__ == '__main__':
         train_structure_adj = create_loader.get_structure_adj(train_df)
         train_distance_matrix =create_loader.get_distance_matrix(train_structure_adj.shape[1])
         train_dataset = VacDataset(train_features_tensor, train_df, train_structure_adj,
-                                   train_distance_matrix, train_labels_tensor)
+                                   train_distance_matrix, bpps_dirname, train_labels_tensor)
         train_loader = torch.utils.data.DataLoader(train_dataset, cfg.BATCH_SIZE, shuffle=True, drop_last=False)
 
         # K-th fold validation data
@@ -90,7 +91,7 @@ if __name__ == '__main__':
         valid_structure_adj = create_loader.get_structure_adj(val_df)
         valid_distance_matrix =create_loader.get_distance_matrix(valid_structure_adj.shape[1])
         valid_dataset = VacDataset(valid_features_tensor, val_df, valid_structure_adj,
-                                   valid_distance_matrix, valid_labels_tensor)
+                                   valid_distance_matrix, bpps_dirname, valid_labels_tensor)
         valid_loader = torch.utils.data.DataLoader(valid_dataset, cfg.BATCH_SIZE, shuffle=True, drop_last=False)
 
         ae_model = AEModel()
@@ -152,7 +153,7 @@ if __name__ == '__main__':
     pub_structure_adj = create_loader.get_structure_adj(public_df)
     pub_distance_matrix = create_loader.get_distance_matrix(pub_structure_adj.shape[1])
     pub_dataset = VacDataset(pub_features_tensor, public_df, pub_structure_adj,
-                             pub_distance_matrix, pub_labels_tensor)
+                             pub_distance_matrix, bpps_dirname, pub_labels_tensor)
     pub_loader = torch.utils.data.DataLoader(pub_dataset, 1, shuffle=True, drop_last=False)
 
     # Load and preprocess private test data to feed into regression model
@@ -162,7 +163,7 @@ if __name__ == '__main__':
     pri_structure_adj = create_loader.get_structure_adj(private_df)
     pri_distance_matrix = create_loader.get_distance_matrix(pri_structure_adj.shape[1])
     pri_dataset = VacDataset(pri_features_tensor, private_df, pri_structure_adj,
-                             pri_distance_matrix, pri_labels_tensor)
+                             pri_distance_matrix, bpps_dirname, pri_labels_tensor)
     pri_loader = torch.utils.data.DataLoader(pri_dataset, 1, shuffle=True, drop_last=False)
 
     # Predict results for public and private test data
