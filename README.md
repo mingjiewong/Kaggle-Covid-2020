@@ -33,4 +33,4 @@ python main.py
 **_Acknowledgements_**
 ***
 * Special thanks to my other team member: [Jing](https://www.kaggle.com/jinghuiwong)
-* Solution inspired by both [mrkmakr](https://www.kaggle.com/mrkmakr/covid-ae-pretrain-gnn-attn-cnn) and [CPMP](https://www.kaggle.com/cpmpml/graph-transfomer)
+* Solution inspired by both [CPMP](https://www.kaggle.com/cpmpml/graph-transfomer) and [mrkmakr](https://www.kaggle.com/mrkmakr/covid-ae-pretrain-gnn-attn-cnn)
