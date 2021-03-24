@@ -49,7 +49,7 @@ if __name__ == '__main__':
     train_ae_model = TrainAE(ae_model)
     train_ae_model = TrainAE(ae_model)
     res = dict(end_epoch=0, it=0, min_loss_epoch=0)
-    epochs = [3, 3, 3, 3] #[5, 5, 5, 5]
+    epochs = [2, 2, 2, 2] #[5, 5, 5, 5]
     for e in epochs:
         res = train_ae_model.train_ae(loader0, e, device=device)
         res = train_ae_model.train_ae(loader1, e, device=device)
