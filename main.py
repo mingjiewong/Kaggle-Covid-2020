@@ -118,7 +118,7 @@ if __name__ == '__main__':
             print(f"epoch: {epoch}")
             model.train()
             for i, data in enumerate(train_loader):
-                _, loss = loss_eval.learn_from_batch(model, data, optimizer, cfg.lr_scheduler, cfg.device)
+                _, loss = loss_eval.learn_from_batch(model, data, optimizer, cfg.lr_scheduler, device)
                 loss_v = loss.item()
                 writer.add_scalar('loss', loss_v, it)
                 losses.append(loss_v)
@@ -126,7 +126,7 @@ if __name__ == '__main__':
             print(f'epoch: {epoch} loss: {np.mean(losses)}')
             losses = []
 
-            eval_result = loss_eval.evaluate(model, valid_loader, cfg.device)
+            eval_result = loss_eval.evaluate(model, valid_loader, device)
             eval_loss = eval_result["loss"]
             if eval_loss <= min_eval_loss:
                 min_eval_epoch = epoch
@@ -184,8 +184,8 @@ if __name__ == '__main__':
         del state_dict
 
         data_list = []
-        data_list += predict.predict_data(model_pub, pub_loader, cfg.device, 1, load.target_cols)
-        data_list += predict.predict_data(model_pri, pri_loader, cfg.device, 1, load.target_cols)
+        data_list += predict.predict_data(model_pub, pub_loader, device, 1, load.target_cols)
+        data_list += predict.predict_data(model_pri, pri_loader, device, 1, load.target_cols)
         pred_df = pd.DataFrame(data_list, columns=["id_seqpos"] + load.target_cols)
         pred_df_list.append(pred_df)
         c += 1
