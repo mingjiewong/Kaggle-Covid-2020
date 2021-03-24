@@ -6,7 +6,7 @@ from torch.utils.tensorboard import SummaryWriter
 from pathlib import Path
 
 from ae_model.preprocessing import Load, CreateLoader, VacDataset
-from ae_model.autoencoder import AEModel, TrainAE
+from ae_model.autoencoder import *
 from ae_model.prediction import Config, Loss, Predict
 
 if __name__ == '__main__':
@@ -50,7 +50,7 @@ if __name__ == '__main__':
     train_ae_model = TrainAE(ae_model)
     train_ae_model = TrainAE(ae_model)
     res = dict(end_epoch=0, it=0, min_loss_epoch=0)
-    epochs = [2, 2, 2, 2] #[5, 5, 5, 5]
+    epochs = [5, 5, 5, 5]
     for e in epochs:
         res = train_ae_model.train_ae(loader0, e, device=device)
         res = train_ae_model.train_ae(loader1, e, device=device)
@@ -164,7 +164,7 @@ if __name__ == '__main__':
     pri_distance_matrix = create_loader.get_distance_matrix(pri_structure_adj.shape[1])
     pri_dataset = VacDataset(pri_features_tensor, private_df, pri_structure_adj,
                              pri_distance_matrix, bpps_dirname, None)
-    pri_loader = torch.utils.data.DataLoader(pri_dataset, 1, shuffle=False, drop_last=False) 
+    pri_loader = torch.utils.data.DataLoader(pri_dataset, 1, shuffle=False, drop_last=False)
 
     # Predict results for public and private test data
     predict = Predict()
