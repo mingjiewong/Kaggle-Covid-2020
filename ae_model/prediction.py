@@ -3,6 +3,8 @@ import random
 import os
 import numpy as np
 
+from torch import nn
+
 random.seed(42)
 np.random.seed(42)
 os.environ["PYTHONHASHSEED"] = str(42)
