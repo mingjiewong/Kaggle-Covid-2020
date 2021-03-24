@@ -11,11 +11,11 @@ torch.manual_seed(42)
 class Config(object):
     def __init__(self):
         self.BATCH_SIZE = 64
-        self.k_folds = 5 #12
+        self.k_folds = 2 #12
         self.lr_scheduler = None
         self.test_size = .1
         self.device = torch.device('cuda') if torch.cuda.is_available() else "cpu"
-        self.epoch = 10 #200
+        self.epoch = 3 #200
 
 class Loss:
     def __init__(self):
