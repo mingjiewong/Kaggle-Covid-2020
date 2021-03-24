@@ -2,7 +2,6 @@ import torch
 import random
 import os
 import numpy as np
-from sklearn.model_selection import ShuffleSplit
 
 random.seed(42)
 np.random.seed(42)
