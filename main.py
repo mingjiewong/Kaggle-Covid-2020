@@ -11,8 +11,8 @@ from ae_model.prediction import Config, Loss, Predict
 
 if __name__ == '__main__':
     ### Configure file names and device
-    train_data_filename = '../input/stanford-covid-vaccine/train.json'
-    test_data_filename = '../input/stanford-covid-vaccine/test.json'
+    train_data_filename = './datasets/stanford-covid-vaccine/train.json'
+    test_data_filename = './datasets/stanford-covid-vaccine/test.json'
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     ### Load and preprocess training data and test data to feed into denoising Auto Encoder (AE) model
