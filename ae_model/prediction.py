@@ -4,6 +4,7 @@ import os
 import numpy as np
 
 from torch import nn
+from fastprogress import progress_bar
 
 random.seed(42)
 np.random.seed(42)
