@@ -150,39 +150,21 @@ if __name__ == '__main__':
     pub_features, pub_labels = load.preprocess(public_df, is_test=True)
     pub_features_tensor = torch.from_numpy(pub_features)
 
-    if pub_labels is not None:
-        pub_labels_tensor = torch.from_numpy(pub_labels)
-        pub_structure_adj = create_loader.get_structure_adj(public_df)
-        pub_distance_matrix = create_loader.get_distance_matrix(pub_structure_adj.shape[1])
-        pub_dataset = VacDataset(pub_features_tensor, public_df, pub_structure_adj,
-                                 pub_distance_matrix, bpps_dirname, pub_labels_tensor)
-        pub_loader = torch.utils.data.DataLoader(pub_dataset, 1, shuffle=True, drop_last=False)
-
-    else:
-        pub_structure_adj = create_loader.get_structure_adj(public_df)
-        pub_distance_matrix = create_loader.get_distance_matrix(pub_structure_adj.shape[1])
-        pub_dataset = VacDataset(pub_features_tensor, public_df, pub_structure_adj,
-                                 pub_distance_matrix, bpps_dirname, None)
-        pub_loader = torch.utils.data.DataLoader(pub_dataset, 1, shuffle=False, drop_last=False)
+    pub_structure_adj = create_loader.get_structure_adj(public_df)
+    pub_distance_matrix = create_loader.get_distance_matrix(pub_structure_adj.shape[1])
+    pub_dataset = VacDataset(pub_features_tensor, public_df, pub_structure_adj,
+                             pub_distance_matrix, bpps_dirname, None)
+    pub_loader = torch.utils.data.DataLoader(pub_dataset, 1, shuffle=False, drop_last=False)
 
     # Load and preprocess private test data to feed into regression model
     pri_features, pri_labels = load.preprocess(private_df, is_test=True)
     pri_features_tensor = torch.from_numpy(pri_features)
 
-    if pri_labels is not None:
-        pri_labels_tensor = torch.from_numpy(pri_labels)
-        pri_structure_adj = create_loader.get_structure_adj(private_df)
-        pri_distance_matrix = create_loader.get_distance_matrix(pri_structure_adj.shape[1])
-        pri_dataset = VacDataset(pri_features_tensor, private_df, pri_structure_adj,
-                                 pri_distance_matrix, bpps_dirname, pri_labels_tensor)
-        pri_loader = torch.utils.data.DataLoader(pri_dataset, 1, shuffle=True, drop_last=False)
-
-    else:
-        pri_structure_adj = create_loader.get_structure_adj(private_df)
-        pri_distance_matrix = create_loader.get_distance_matrix(pri_structure_adj.shape[1])
-        pri_dataset = VacDataset(pri_features_tensor, private_df, pri_structure_adj,
-                                 pri_distance_matrix, bpps_dirname, None)
-        pri_loader = torch.utils.data.DataLoader(pri_dataset, 1, shuffle=False, drop_last=False)
+    pri_structure_adj = create_loader.get_structure_adj(private_df)
+    pri_distance_matrix = create_loader.get_distance_matrix(pri_structure_adj.shape[1])
+    pri_dataset = VacDataset(pri_features_tensor, private_df, pri_structure_adj,
+                             pri_distance_matrix, bpps_dirname, None)
+    pri_loader = torch.utils.data.DataLoader(pri_dataset, 1, shuffle=False, drop_last=False) 
 
     # Predict results for public and private test data
     predict = Predict()
