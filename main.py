@@ -13,7 +13,7 @@ if __name__ == '__main__':
     ### Configure file names and device
     train_data_filename = './datasets/stanford-covid-vaccine/train.json'
     test_data_filename = './datasets/stanford-covid-vaccine/test.json'
-    bpps_dirname = './datasets/stanford-covid-vaccine/bpps/'
+    bpps_dirname = f'./datasets/stanford-covid-vaccine/bpps/'
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     ### Load and preprocess training data and test data to feed into denoising Auto Encoder (AE) model
