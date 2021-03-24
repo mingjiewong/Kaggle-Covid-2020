@@ -6,7 +6,7 @@ from torch.utils.tensorboard import SummaryWriter
 from pathlib import Path
 
 from ae_model.preprocessing import Load, CreateLoader, VacDataset
-from ae_model.autoencoder import AEModel, TrainAE,
+from ae_model.autoencoder import AEModel, TrainAE
 from ae_model.prediction import Config, Loss, Predict
 
 if __name__ == '__main__':
