@@ -65,7 +65,7 @@ class Load:
 
 
 class VacDataset(Dataset):
-    def __init__(self, features, loaded_data, structure_adj, distance_matrix, labels=None):
+    def __init__(self, features, loaded_data, structure_adj, distance_matrix, path_bpps, labels=None):
         self.features = features
         self.labels = labels
         self.test = labels is None
@@ -73,6 +73,7 @@ class VacDataset(Dataset):
         self.score = None
         self.structure_adj = structure_adj
         self.distance_matrix = distance_matrix
+        self.path_bpps = path_bpps
         if "score" in loaded_data.columns:
             self.score = loaded_data["score"]
         else:
@@ -90,7 +91,7 @@ class VacDataset(Dataset):
 
     @functools.lru_cache(5000)
     def load_from_id_data(self, id_):
-        path = Path(f"../input/stanford-covid-vaccine/bpps/{id_}.npy")
+        path = Path(self.path_bpps)
         data = np.load(str(path))
         return data
 
@@ -110,12 +111,6 @@ class VacDataset(Dataset):
 class CreateLoader:
     def __init__(self):
         pass
-
-    @functools.lru_cache(5000)
-    def load_from_id(self, id_):
-        path = Path(f"../input/stanford-covid-vaccine/bpps/{id_}.npy")
-        data = np.load(str(path))
-        return data
 
     def get_distance_matrix(self, leng):
         idx = np.arange(leng)
