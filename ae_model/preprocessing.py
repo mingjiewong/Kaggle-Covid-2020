@@ -91,7 +91,7 @@ class VacDataset(Dataset):
 
     @functools.lru_cache(5000)
     def load_from_id_data(self, id_):
-        path = Path(self.path_bpps)
+        path = Path(self.path_bpps+f"{id_}.npy")
         data = np.load(str(path))
         return data
 
