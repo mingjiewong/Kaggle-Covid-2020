@@ -114,7 +114,7 @@ if __name__ == '__main__':
         it = 0
         model_save_path = Path("./model")
         start_epoch = 0
-        end_epoch = start_epoch + cfg.epoch
+        end_epoch = start_epoch + cfg.reg_epochs
         if not model_save_path.exists():
             model_save_path.mkdir(parents=True)
         min_eval_loss = 10.0
