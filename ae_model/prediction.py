@@ -11,14 +11,6 @@ np.random.seed(42)
 os.environ["PYTHONHASHSEED"] = str(42)
 torch.manual_seed(42)
 
-class Config(object):
-    def __init__(self):
-        self.BATCH_SIZE = 64
-        self.k_folds = 3 #12
-        self.lr_scheduler = None
-        self.test_size = .1
-        self.epoch = 5 #200
-
 class Loss:
     def __init__(self):
         pass
