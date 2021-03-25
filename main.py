@@ -17,9 +17,10 @@ if __name__ == '__main__':
     ### Configure file names and device
     train_data_filename = './datasets/stanford-covid-vaccine/train.json'
     test_data_filename = './datasets/stanford-covid-vaccine/test.json'
+    yaml_filename = './config.yaml'
     bpps_dirname = f'./datasets/stanford-covid-vaccine/bpps/'
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    cfg = Config('./config.yaml')
+    cfg = Config(yaml_filename)
 
     ### Load and preprocess training data and test data to feed into denoising Auto Encoder (AE) model
     load = Load(base_train_data=train_data_filename, base_test_data=test_data_filename)
@@ -50,7 +51,7 @@ if __name__ == '__main__':
     loader2 = torch.utils.data.DataLoader(dataset2, batch_size=64, shuffle=False, drop_last=False)
 
     ### Pre-train denoising AE model
-    ae_model = AEModel()
+    ae_model = AEModel(yaml_filename)
     ae_model.to(device)
     train_ae_model = TrainAE(ae_model)
     train_ae_model = TrainAE(ae_model)
@@ -98,7 +99,7 @@ if __name__ == '__main__':
                                    valid_distance_matrix, bpps_dirname, valid_labels_tensor)
         valid_loader = torch.utils.data.DataLoader(valid_dataset, cfg.BATCH_SIZE, shuffle=True, drop_last=False)
 
-        ae_model = AEModel()
+        ae_model = AEModel(yaml_filename)
         state_dict = torch.load("./ae-model.pt")
         ae_model.load_state_dict(state_dict)
         del state_dict
@@ -176,8 +177,8 @@ if __name__ == '__main__':
     c = 0
     for fold in range(cfg.k_folds):
         model_load_path = f"./model_prediction/model-{fold}.pt"
-        ae_model0 = AEModel()
-        ae_model1 = AEModel()
+        ae_model0 = AEModel(yaml_filename)
+        ae_model1 = AEModel(yaml_filename)
         model_pub = FromAeModel(pred_len=107, seq=ae_model0.seq)
         model_pub = model_pub.to(device)
         model_pri = FromAeModel(pred_len=130, seq=ae_model1.seq)
