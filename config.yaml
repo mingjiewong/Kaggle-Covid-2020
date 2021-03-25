@@ -1,5 +1,5 @@
 #===================================
-# General Params for pretrained AE 
+# General Params for pretrained AE
 #===================================
 ae_epochs: 5
 ae_iters: 4
@@ -21,6 +21,10 @@ units1: 128
 units2: 64
 units3: 32
 units4: 32
+
+dilation2: 2
+dilation3: 1
+dilation4: 2
 
 #===================================
 # General Params for Regression
