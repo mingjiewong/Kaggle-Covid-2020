@@ -9,6 +9,7 @@ from torch import nn
 from torch.nn import TransformerEncoder, TransformerEncoderLayer
 from pathlib import Path
 from fastprogress import progress_bar
+from data_processing.helpers import Config
 
 random.seed(42)
 np.random.seed(42)
@@ -60,12 +61,13 @@ class Conv2dStack(nn.Module):
 
 
 class SeqEncoder(nn.Module):
-    def __init__(self, in_dim: int):
+    def __init__(self, config_path, in_dim: int):
         super(SeqEncoder, self).__init__()
-        self.conv0 = Conv1dStack(in_dim, 128, 3, padding=1)
-        self.conv1 = Conv1dStack(128, 64, 6, padding=5, dilation=2)
-        self.conv2 = Conv1dStack(64, 32, 15, padding=7, dilation=1)
-        self.conv3 = Conv1dStack(32, 32, 30, padding=29, dilation=2)
+        cfg = Config(config_path)
+        self.conv0 = Conv1dStack(in_dim, cfg.units1, cfg.kernel_size1, padding=cfg.padding1)
+        self.conv1 = Conv1dStack(cfg.units1, cfg.units2, cfg.kernel_size2, padding=cfg.padding2, dilation=cfg.dilation2)
+        self.conv2 = Conv1dStack(cfg.units2, cfg.units3, cfg.kernel_size3, padding=cfg.padding3, dilation=cfg.dilation3)
+        self.conv3 = Conv1dStack(cfg.units3, cfg.units4, cfg.kernel_size4, padding=cfg.padding4, dilation=cfg.dilation4)
 
     def forward(self, x):
         x1 = self.conv0(x)
@@ -149,12 +151,12 @@ class RnnLayers(nn.Module):
 
 
 class BaseAttnModel(nn.Module):
-    def __init__(self, transformer_layers: int = 2):
+    def __init__(self, config_path='', transformer_layers: int = 2):
         super(BaseAttnModel, self).__init__()
         self.linear0 = nn.Linear(14 + 3, 1)
-        self.seq_encoder_x = SeqEncoder(18)
+        self.seq_encoder_x = SeqEncoder(config_path, 18)
         self.attn = BppAttn(256, 128)
-        self.seq_encoder_bpp = SeqEncoder(128)
+        self.seq_encoder_bpp = SeqEncoder(config_path, 128)
         self.seq = RnnLayers(256 * 2, dropout=0.3,
                              transformer_layers=transformer_layers)
         self.bpp_nb_mean = 0.077522 # mean of bpps_nb across all training data
@@ -185,9 +187,9 @@ class BaseAttnModel(nn.Module):
 
 
 class AEModel(nn.Module):
-    def __init__(self, transformer_layers: int = 2):
+    def __init__(self, config_path='', transformer_layers: int = 2):
         super(AEModel, self).__init__()
-        self.seq = BaseAttnModel(transformer_layers=transformer_layers)
+        self.seq = BaseAttnModel(config_path=config_path, transformer_layers=transformer_layers)
         self.linear = nn.Sequential(
             nn.Linear(256 * 2, 14),
             nn.Sigmoid(),
