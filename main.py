@@ -10,7 +10,8 @@ from pathlib import Path
 
 from ae_model.preprocessing import Load, CreateLoader, VacDataset
 from ae_model.autoencoder import AEModel, TrainAE, FromAeModel
-from ae_model.prediction import Config, Loss, Predict
+from ae_model.prediction import Loss, Predict
+from data_processing.helpers import Config
 
 if __name__ == '__main__':
     ### Configure file names and device
@@ -18,6 +19,7 @@ if __name__ == '__main__':
     test_data_filename = './datasets/stanford-covid-vaccine/test.json'
     bpps_dirname = f'./datasets/stanford-covid-vaccine/bpps/'
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    cfg = Config('./config.yaml')
 
     ### Load and preprocess training data and test data to feed into denoising Auto Encoder (AE) model
     load = Load(base_train_data=train_data_filename, base_test_data=test_data_filename)
@@ -53,7 +55,7 @@ if __name__ == '__main__':
     train_ae_model = TrainAE(ae_model)
     train_ae_model = TrainAE(ae_model)
     res = dict(end_epoch=0, it=0, min_loss_epoch=0)
-    epochs = [3, 3, 3, 3] #[5, 5, 5, 5]
+    epochs = cfg.ae_iters*[cfg.ae_epochs]
     for e in epochs:
         res = train_ae_model.train_ae(loader0, e, device=device)
         res = train_ae_model.train_ae(loader1, e, device=device)
@@ -63,7 +65,6 @@ if __name__ == '__main__':
     shutil.copyfile(f"./model/model-{epoch}.pt", "ae-model.pt")
 
     ### Train regression model from pre-trained AE model
-    cfg = Config()
     loss_eval = Loss()
 
     split = ShuffleSplit(n_splits=cfg.k_folds, test_size=cfg.test_size)
