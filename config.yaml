@@ -1,0 +1,32 @@
+#===================================
+# General Params for pretrained AE 
+#===================================
+ae_epochs: 5
+ae_iters: 4
+
+#===================================
+# SeqEncoder (in AE) Params
+#===================================
+kernel_size1: 3
+kernel_size2: 6
+kernel_size3: 15
+kernel_size4: 30
+
+padding1: 1
+padding2: 5
+padding3: 7
+padding4: 29
+
+units1: 128
+units2: 64
+units3: 32
+units4: 32
+
+#===================================
+# General Params for Regression
+#===================================
+BATCH_SIZE: 64
+k_folds: 3
+lr_scheduler: null
+test_size: .1
+reg_epochs: 5
