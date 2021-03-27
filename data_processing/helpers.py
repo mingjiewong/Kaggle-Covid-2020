@@ -7,9 +7,9 @@ class Config:
 
         Args:
           path_to_config (str): file path for config.yaml
-          
+
         Attributes:
-          dictionary (obj): a dictionary containing all parameter values from config.yaml
+          dictionary (dict): a dictionary containing all parameter values from config.yaml
         """
 
         self.path_to_config = path_to_config
