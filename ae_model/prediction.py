@@ -31,7 +31,7 @@ class Loss:
 
     def sn_mcrmse_loss(self, predict, target, signal_to_noise):
         '''
-        Generate signal-to-noise weighted mean columnwise root mean squared error.
+        Generate signal-to-noise scaled mean columnwise root mean squared error.
 
         Args:
           predict (arr): true target values
