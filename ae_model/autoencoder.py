@@ -503,11 +503,11 @@ class TrainAE:
           epochs (int): number of epochs
           device (str): choice of gpu or cpu for running model
           start_epoch (int): index of starting epoch
-          start_it (int): index of starting observation from input data
+          start_it (int): index of starting sample from input data
           MODEL_SAVE_PATH (str): file path for saved model
 
         Returns:
-          dict: index of ending epoch, index of ending observation from input data,
+          dict: index of ending epoch, index of ending sample from input data,
             index of epoch with minimum loss value
         '''
         print(f"device: {device}")
