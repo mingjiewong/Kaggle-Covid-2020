@@ -143,7 +143,7 @@ class Predict:
           target_cols (arr): target features
 
         Returns:
-          arr: list of list of dict of target features and their corresponding predictions
+          arr: list of batches of dict of target features and their corresponding predictions
         '''
         data_list = []
         for i, data in enumerate(progress_bar(loader)):
