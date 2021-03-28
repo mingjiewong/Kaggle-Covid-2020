@@ -30,7 +30,7 @@ dilation4: 2
 # General Params for Regression
 #===================================
 BATCH_SIZE: 64
-k_folds: 2
+k_folds: 12
 lr_scheduler: null
 test_size: .1
-reg_epochs: 10
+reg_epochs: 200
