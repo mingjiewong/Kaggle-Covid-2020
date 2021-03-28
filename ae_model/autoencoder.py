@@ -19,7 +19,7 @@ torch.manual_seed(42)
 class Conv1dStack(nn.Module):
     def __init__(self, in_dim, out_dim, kernel_size=3, padding=1, dilation=1):
         '''
-        Load model configurations for 1D convolution stacks.
+        Load model parameters for 1D convolution stacks.
 
         Args:
           in_dim (int): dimension of input data
@@ -48,7 +48,7 @@ class Conv1dStack(nn.Module):
 
     def forward(self, x):
         '''
-        Load forward pass.
+        Run forward pass.
 
         Args:
           x (arr): input data
@@ -64,7 +64,7 @@ class Conv1dStack(nn.Module):
 class Conv2dStack(nn.Module):
     def __init__(self, in_dim, out_dim, kernel_size=3, padding=1, dilation=1):
         '''
-        Load model configurations for 2D convolution stacks.
+        Load model parameters for 2D convolution stacks.
 
         Args:
           in_dim (int): dimension of input data
@@ -93,7 +93,7 @@ class Conv2dStack(nn.Module):
 
     def forward(self, x):
         '''
-        Load forward pass.
+        Run forward pass.
 
         Args:
           x (arr): input data
@@ -107,19 +107,19 @@ class Conv2dStack(nn.Module):
 
 
 class SeqEncoder(nn.Module):
-    def __init__(self, config_path, in_dim: int):
+    def __init__(self, config_path='', in_dim: int):
         '''
-        Load model configurations for sequence encoder.
+        Load model parameters for sequence encoder.
 
         Args:
           config_path (str): file path for config.yaml
           in_dim (int): dimension of input data
 
         Attributes:
-          conv0 (obj): first convolution stacked block
-          conv1 (obj): second convolution stacked block
-          conv2 (obj): third convolution stacked block
-          conv3 (obj): fourth convolution stacked block
+          conv0 (obj): first stacked convolution block
+          conv1 (obj): second stacked convolution block
+          conv2 (obj): third stacked convolution block
+          conv3 (obj): fourth stacked convolution block
         '''
         super(SeqEncoder, self).__init__()
         cfg = Config(config_path)
@@ -130,7 +130,7 @@ class SeqEncoder(nn.Module):
 
     def forward(self, x):
         '''
-        Load forward pass.
+        Run forward pass.
 
         Args:
           x (arr): input data
@@ -149,15 +149,15 @@ class SeqEncoder(nn.Module):
 class BppAttn(nn.Module):
     def __init__(self, in_channel: int, out_channel: int):
         '''
-        Load model configurations for attention filter on base-pairing sequence.
+        Load parameters for generating attention filter on sequence of base-pairing probabilities.
 
         Args:
           in_channel (int): dimension of input data
           out_channel (int): dimension of output data
 
         Attributes:
-          conv0 (obj): 1D convolution stacked block
-          bpp_conv (obj): 2D convolution stacked block
+          conv0 (obj): 1D stacked convolution block
+          bpp_conv (obj): 2D stacked convolution stacked block
         '''
         super(BppAttn, self).__init__()
         self.conv0 = Conv1dStack(in_channel, out_channel, 3, padding=1)
@@ -165,7 +165,7 @@ class BppAttn(nn.Module):
 
     def forward(self, x, bpp):
         '''
-        Load forward pass.
+        Run forward pass.
 
         Args:
           x (arr): input data
@@ -184,7 +184,7 @@ class BppAttn(nn.Module):
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, dropout=0.1, max_len=5000):
         '''
-        Load model configurations for positional encoding.
+        Load parameters for positional encoding.
 
         Args:
           d_model (int): number of latent dimensions
@@ -192,6 +192,7 @@ class PositionalEncoding(nn.Module):
           max_len (int): maximum vocabulary size
 
         Attributes:
+          dropout (obj): dropout layer
           register_buffer (obj): register positional encoding matrix as a non-parameter
         '''
         super(PositionalEncoding, self).__init__()
@@ -207,7 +208,7 @@ class PositionalEncoding(nn.Module):
 
     def forward(self, x):
         '''
-        Load forward pass.
+        Run forward pass.
 
         Args:
           x (arr): input data
@@ -222,20 +223,18 @@ class PositionalEncoding(nn.Module):
 class TransformerWrapper(nn.Module):
     def __init__(self, dmodel=256, nhead=8, num_layers=2):
         '''
-        Load model configurations for both transformer and positional encoding blocks.
+        Load model parameters for both transformer and positional encoding blocks.
 
         Args:
           dmodel (int): number of latent dimensions
           nhead (int): number of attention heads
-          num_layers (int): number of layers
+          num_layers (int): number of transformer layers
 
         Attributes:
-          pos_encoder (obj): positional encoder block
           transformer_encoder (obj): transformer encoder block
           pos_emb (obj): positional encoder block
         '''
         super(TransformerWrapper, self).__init__()
-        self.pos_encoder = PositionalEncoding(256)
         encoder_layer = TransformerEncoderLayer(d_model=dmodel, nhead=nhead)
         self.transformer_encoder = TransformerEncoder(encoder_layer, num_layers)
         self.pos_emb = PositionalEncoding(dmodel)
@@ -245,13 +244,14 @@ class TransformerWrapper(nn.Module):
 
     def forward(self, x):
         '''
-        Load forward pass.
+        Run forward pass.
 
         Args:
           x (arr): input data
 
         Returns:
           arr: output data
+          None
         '''
         x = x.permute((1, 0, 2)).contiguous()
         x = self.pos_emb(x)
@@ -263,7 +263,7 @@ class TransformerWrapper(nn.Module):
 class RnnLayers(nn.Module):
     def __init__(self, dmodel, dropout=0.3, transformer_layers: int = 2):
         '''
-        Load model configurations for RNN layers.
+        Load model parameters for RNN layers.
 
         Args:
           dmodel (int): number of latent dimensions
@@ -284,7 +284,7 @@ class RnnLayers(nn.Module):
 
     def forward(self, x):
         '''
-        Load forward pass.
+        Run forward pass.
 
         Args:
           x (arr): input data
@@ -308,7 +308,7 @@ class RnnLayers(nn.Module):
 class BaseAttnModel(nn.Module):
     def __init__(self, config_path='', transformer_layers: int = 2):
         '''
-        Load model configurations for base attention component.
+        Load parameters for base attention model.
 
         Args:
           config_path (str): file path for config.yaml
@@ -316,12 +316,12 @@ class BaseAttnModel(nn.Module):
 
         Attributes:
           linear0 (obj): linear layer
-          seq_encoder_x (obj): sequence encoder layer for input data
-          attn (obj): attention filter layer for base-pairing probabilities
-          seq_encoder_bpp (obj): sequence encoder layer for base-pairing probabilities
+          seq_encoder_x (obj): layer for sequence encoding on input data
+          attn (obj): layer for generating attention filter on base-pairing probabilities
+          seq_encoder_bpp (obj): layer for sequence encoding on base-pairing probabilities
           seq (obj): RNN layers
-          bpp_nb_mean (float): mean number of non-zeros base-pairing probabilities
-          bpp_nb_std (float): standard deviation of number of non-zeros base-pairing probabilities
+          bpp_nb_mean (float): mean number of non-zero base-pairing probabilities
+          bpp_nb_std (float): standard deviation of number of non-zero base-pairing probabilities
         '''
         super(BaseAttnModel, self).__init__()
         self.linear0 = nn.Linear(14 + 3, 1)
@@ -335,14 +335,14 @@ class BaseAttnModel(nn.Module):
 
     def get_bpp_feature(self, bpp):
         '''
-        Generate the general statistics of base-pairing probabilities in a sequence.
+        Generate general statistics of base-pairing probabilities in a sequence.
 
         Args:
           bpp (arr): base-pairing probabilities in a sequence with dimensions
             [len_sequence, len_sequence]
 
         Returns:
-          arr: [maximum base-pairing_probabilities,
+          arr: [maximum base-pairing probabilities,
             sum of base-pairing probabilities,
             normalized number of non-zero base-pairing probabilities]
         '''
@@ -354,7 +354,7 @@ class BaseAttnModel(nn.Module):
 
     def forward(self, x, bpp):
         '''
-        Load forward pass.
+        Run forward pass.
 
         Args:
           x (arr): input data
@@ -383,15 +383,15 @@ class BaseAttnModel(nn.Module):
 class AEModel(nn.Module):
     def __init__(self, config_path='', transformer_layers: int = 2):
         '''
-        Load model configurations for full model.
+        Load parameters for full model.
 
         Args:
           config_path (str): file path for config.yaml
           transformer_layers (int): number of transformer layers
 
         Attributes:
-          seq (obj): base attention component
-          linear (obj): final linear output layer
+          seq (obj): base attention model
+          linear (obj): linear layer with activation function
         '''
         super(AEModel, self).__init__()
         self.seq = BaseAttnModel(config_path=config_path, transformer_layers=transformer_layers)
@@ -402,7 +402,7 @@ class AEModel(nn.Module):
 
     def forward(self, x, bpp):
         '''
-        Load forward pass.
+        Run forward pass.
 
         Args:
           x (arr): input data
@@ -421,16 +421,16 @@ class AEModel(nn.Module):
 class FromAeModel(nn.Module):
     def __init__(self, seq, pred_len=68, dmodel: int = 256):
         '''
-        Load model configurations for full model.
+        Load parameters for full model.
 
         Args:
           seq (obj): model
-          pred_len (int): length of prediction
+          pred_len (int): prediction length
           dmodel (int): number of latent dimensions
 
         Attributes:
           seq (obj): model
-          pred_len (int): length of prediction
+          pred_len (int): prediction length
           linear (obj): linear layer
         '''
         super(FromAeModel, self).__init__()
@@ -442,7 +442,7 @@ class FromAeModel(nn.Module):
 
     def forward(self, x, bpp):
         '''
-        Load forward pass.
+        Run forward pass.
 
         Args:
           x (arr): input data
@@ -460,7 +460,7 @@ class FromAeModel(nn.Module):
 class TrainAE:
     def __init__(self, model):
         '''
-        Load configurations for full model, learning rate scheduler and optimizer.
+        Load parameters for full model, learning rate scheduler and optimizer.
 
         Args:
           model (obj): model
@@ -479,8 +479,8 @@ class TrainAE:
         Generate loss value.
 
         Args:
-          data (arr): training input data
-          device (str): choice of gpu or cpu
+          data (arr): input data
+          device (str): choice of gpu or cpu for running model
 
         Returns:
           loss (float): loss value
@@ -499,16 +499,16 @@ class TrainAE:
         Run model.
 
         Args:
-          train_data (arr): training input data
+          train_data (arr): input data
           epochs (int): number of epochs
-          device (str): choice of gpu or cpu
-          start_epoch (int): starting epoch
-          start_it (int): starting observation from training input data
+          device (str): choice of gpu or cpu for running model
+          start_epoch (int): index of starting epoch
+          start_it (int): index of starting observation from input data
           MODEL_SAVE_PATH (str): file path for saved model
 
         Returns:
-          dict: ending epoch, ending observation from training input data,
-            epoch with minimum loss value
+          dict: index of ending epoch, index of ending observation from input data,
+            index of epoch with minimum loss value
         '''
         print(f"device: {device}")
         losses = []
