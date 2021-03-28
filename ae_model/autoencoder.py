@@ -107,7 +107,7 @@ class Conv2dStack(nn.Module):
 
 
 class SeqEncoder(nn.Module):
-    def __init__(self, config_path='', in_dim: int):
+    def __init__(self, config_path, in_dim: int):
         '''
         Load model parameters for sequence encoder.
 
