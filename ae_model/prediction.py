@@ -16,16 +16,51 @@ class Loss:
         pass
 
     def MCRMSE(self, y_true, y_pred):
+        '''
+        Generate mean columnwise root mean squared error.
+
+        Args:
+          y_true (arr): true target values
+          y_pred (arr): predicted target values
+
+        Returns:
+          float: mean columnwise root mean squared error
+        '''
         colwise_mse = torch.mean(torch.square(y_true - y_pred), dim=1)
         return torch.mean(torch.sqrt(colwise_mse), dim=1)
 
     def sn_mcrmse_loss(self, predict, target, signal_to_noise):
+        '''
+        Generate signal-to-noise weighted mean columnwise root mean squared error.
+
+        Args:
+          predict (arr): true target values
+          target (arr): predicted target values
+          signal_to_noise (float): mean measurement value over mean statistical error in measurement value
+
+        Returns:
+          float: signal-to-noise scaled mean columnwise root mean squared error
+        '''
         loss = self.MCRMSE(target, predict)
         weight = 0.5 * torch.log(signal_to_noise + 1.01)
         loss = (loss * weight).mean()
         return loss
 
     def learn_from_batch(self, model, data, optimizer, lr_scheduler, device):
+        '''
+        Run training on batch.
+
+        Args:
+          model (obj): model
+          data (arr): training data
+          optimizer (obj): optimizer
+          lr_scheduler (obj): learning rate scheduler
+          device (str): choice of gpu or cpu for running model
+
+        Returns:
+          arr: predicted values
+          float: loss value
+        '''
         optimizer.zero_grad()
         out = model(data["sequence"].to(device), data["bpp"].to(device))
         signal_to_noise = data["signal_to_noise"] * data["score"]
@@ -39,6 +74,17 @@ class Loss:
         return out, loss
 
     def evaluate(self, model, valid_data, device):
+        '''
+        Run validation.
+
+        Args:
+          model (obj): model
+          valid_data (arr): validation data
+          device (str): choice of gpu or cpu for running model
+
+        Returns:
+          dict: mean loss value, mean of mean columnwise root mean squared error
+        '''
         model.eval()
         loss_list = []
         mcrmse = []
@@ -58,7 +104,18 @@ class Predict:
         pass
 
     def predict_batch(self, model, data, device, target_cols):
-        # batch x seq_len x target_size
+        '''
+        Run prediction on batch.
+
+        Args:
+          model (obj): model
+          data (arr): test data
+          device (str): choice of gpu or cpu for running model
+          target_cols (arr): target features
+
+        Returns:
+          arr: list of dict of target features and their corresponding predictions
+        '''
         with torch.no_grad():
             pred = model(data["sequence"].to(device), data["bpp"].to(device))
             pred = pred.detach().cpu().numpy()
@@ -75,6 +132,19 @@ class Predict:
         return return_values
 
     def predict_data(self, model, loader, device, batch_size, target_cols):
+        '''
+        Run prediction.
+
+        Args:
+          model (obj): model
+          loader (arr): test data
+          device (str): choice of gpu or cpu for running model
+          batch_size (int): batch size
+          target_cols (arr): target features
+
+        Returns:
+          arr: list of list of dict of target features and their corresponding predictions
+        '''
         data_list = []
         for i, data in enumerate(progress_bar(loader)):
             data_list += self.predict_batch(model, data, device, target_cols)
