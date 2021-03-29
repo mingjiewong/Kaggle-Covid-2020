@@ -15,7 +15,7 @@ torch.manual_seed(42)
 
 class Load:
     def __init__(self, base_train_data='', base_test_data=''):
-        '''
+        """
         Read json files for features of train and test data respectively.
 
         Args:
@@ -28,7 +28,7 @@ class Load:
           target_cols (arr): list of target features
           input_cols (arr): list of train (sequential) features
           token_dicts (dict): dict of train (sequential) features and their corresponding tokens
-        '''
+        """
         self.base_train_data = pd.read_json(base_train_data, lines=True)
         self.base_test_data = pd.read_json(base_test_data, lines=True)
         self.target_cols = ['reactivity', 'deg_Mg_pH10', 'deg_pH10', 'deg_Mg_50C', 'deg_50C']
@@ -38,24 +38,24 @@ class Load:
                             "predicted_loop_type": {x: i for i, x in enumerate("BEHIMSX")}}
 
     def denoise(self):
-        '''
+        """
         Drop samples with noise from training data.
 
         Returns:
           dataframe: denoised input data of features for train data
-        '''
+        """
         denoised_train_data = self.base_train_data[self.base_train_data.signal_to_noise > 1].reset_index(drop = True)
 
         return denoised_train_data
 
     def query_seq_length(self):
-        '''
+        """
         Generate test data with sequence length of 107 and 130 only respectively.
 
         Returns:
           dataframe: updated input data of features for test data with sequence length of 107 only
           dataframe: updated input data of features for test data with sequence length of 130 only
-        '''
+        """
         public_df = self.base_test_data.query("seq_length == 107").copy()
         private_df = self.base_test_data.query("seq_length == 130").copy()
         public_df = public_df.reset_index()
@@ -64,7 +64,7 @@ class Load:
         return public_df, private_df
 
     def preprocess_feature_col(self, loaded_data, col):
-        '''
+        """
         One hot encode a sequential feature of the input data based on the presence of each possible token of the feature at each position of the sequence.
 
         Args:
@@ -74,7 +74,7 @@ class Load:
         Returns:
           arr: updated input data of only one-hot encoded features with dimensions
             [no_samples, len_sequence, no_tokens]
-        '''
+        """
         dic = self.token_dicts[col]
         dic_len = len(dic)
         seq_length = len(loaded_data[col][0])
@@ -86,7 +86,7 @@ class Load:
         return arr
 
     def preprocess_inputs(self, loaded_data, cols):
-        '''
+        """
         Apply one hot encoding on a list of sequential features of the input data.
 
         Args:
@@ -96,11 +96,11 @@ class Load:
         Returns:
           arr: updated input data of only one-hot encoded features with dimensions
             [no_tokens, len_sequence, no_tokens_all_features]
-        '''
+        """
         return np.concatenate([self.preprocess_feature_col(loaded_data, col) for col in cols], axis=2)
 
     def preprocess(self, loaded_data, is_test=False):
-        '''
+        """
         Run preprocessing.
 
         Args:
@@ -112,7 +112,7 @@ class Load:
             [no_samples, len_sequence, 14]
           array: updated input data of only target features with dimensions
             [no_samples, len_sequence, 5]
-        '''
+        """
         inputs = self.preprocess_inputs(loaded_data, self.input_cols)
         if is_test:
             labels = None
@@ -126,7 +126,7 @@ class Load:
 
 class VacDataset(Dataset):
     def __init__(self, features, loaded_data, structure_adj, distance_matrix, path_bpps, labels=None):
-        '''
+        """
         Load all feature values from input data.
 
         Args:
@@ -147,7 +147,7 @@ class VacDataset(Dataset):
           distance_matrix (arr): distance matrix
           path_bpps (str): directory path for sample files of base-pairing probabilities
           signal_to_noise (float): mean measurement value over mean statistical error in measurement value
-        '''
+        """
         self.features = features
         self.labels = labels
         self.test = labels is None
@@ -169,17 +169,17 @@ class VacDataset(Dataset):
             assert self.ids is not None
 
     def __len__(self):
-        '''
+        """
         Calculate number of features.
 
         Returns:
           int: number of features
-        '''
+        """
         return len(self.features)
 
     @functools.lru_cache(5000)
     def load_from_id_data(self, id_):
-        '''
+        """
         Load sequence of base-pairing probabilities of a sample.
 
         Args:
@@ -187,13 +187,13 @@ class VacDataset(Dataset):
 
         Returns:
           arr: sequence of base-pairing probabilities
-        '''
+        """
         path = Path(self.path_bpps+f"{id_}.npy")
         data = np.load(str(path))
         return data
 
     def __getitem__(self, index):
-        '''
+        """
         Load the dict of feature values of a sample.
 
         Args:
@@ -201,7 +201,7 @@ class VacDataset(Dataset):
 
         Return:
           dict: dict of feature values
-        '''
+        """
         bpp = torch.from_numpy(self.load_from_id_data(self.ids[index]).copy()).float()
         adj = self.structure_adj[index]
         distance = self.distance_matrix[0]
@@ -219,7 +219,7 @@ class CreateLoader:
         pass
 
     def get_distance_matrix(self, leng):
-        '''
+        """
         Generate distance matrix from the input data.
 
         Args:
@@ -228,7 +228,7 @@ class CreateLoader:
         Returns:
           arr: distance matrix with dimensions
             [1, len_sequence, len_sequence, 3]
-        '''
+        """
         idx = np.arange(leng)
         Ds = []
         for i in range(len(idx)):
@@ -247,7 +247,7 @@ class CreateLoader:
         return Ds
 
     def get_structure_adj(self, loaded_data):
-        '''
+        """
         Generate adjacency matrices from the sequence of each sample in the input data.
 
         Args:
@@ -256,7 +256,7 @@ class CreateLoader:
         Returns:
           arr: list of adjacency matrices with dimensions
             [no_samples, len_sequence, len_sequence, 1]
-        '''
+        """
         Ss = []
         for i in range(len(loaded_data)):
             seq_length = loaded_data["seq_length"].iloc[i]
