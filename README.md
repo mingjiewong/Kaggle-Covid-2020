@@ -1,12 +1,13 @@
 # Kaggle Covid-19 mRNA Vaccine Degradation Prediction 2020
-**_Background_**
-***
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 The repository contains a [Transformer](https://en.wikipedia.org/wiki/Transformer_(machine_learning_model))-based solution to the [OpenVaccine: COVID-19 mRNA Vaccine Degradation Prediction Competition](https://www.kaggle.com/c/stanford-covid-vaccine) held on Kaggle between September 11 and October 7, 2020. Check out my [profile](https://www.kaggle.com/mwong007)!
 
 ![image](https://github.com/mingjiewong/Kaggle-Covid-2020/blob/master/Figure1.png)
 
-**_Getting Started_**
-***
+## Getting Started
+
 Clone the repo:
 ```
 git clone https://github.com/mingjiewong/Kaggle-Covid-2020.git
@@ -30,7 +31,7 @@ Run the model (from root of the repo):
 python main.py
 ```
 
-**_Acknowledgements_**
+## Acknowledgements
 ***
 * Special thanks to my other team member: [Jing](https://www.kaggle.com/jinghuiwong)
 * Solution inspired by both [CPMP](https://www.kaggle.com/cpmpml/graph-transfomer) and [mrkmakr](https://www.kaggle.com/mrkmakr/covid-ae-pretrain-gnn-attn-cnn)
