@@ -73,7 +73,7 @@ class Load:
 
         Returns:
           arr: updated input data of only one-hot encoded features with dimensions
-            [number of samples, sequence length, number of tokens]
+            [no_samples, len_sequence, no_tokens]
         '''
         dic = self.token_dicts[col]
         dic_len = len(dic)
@@ -95,7 +95,7 @@ class Load:
 
         Returns:
           arr: updated input data of only one-hot encoded features with dimensions
-            [number of samples, sequence length, total number of tokens across all features]
+            [no_tokens, len_sequence, no_tokens_all_features]
         '''
         return np.concatenate([self.preprocess_feature_col(loaded_data, col) for col in cols], axis=2)
 
@@ -109,9 +109,9 @@ class Load:
 
         Returns:
           array: updated input data of only one-hot encoded train (sequential) features with dimensions
-            [number of samples, sequence length, 14]
+            [no_samples, len_sequence, 14]
           array: updated input data of only target features with dimensions
-            [number of samples, sequence length, 5]
+            [no_samples, len_sequence, 5]
         '''
         inputs = self.preprocess_inputs(loaded_data, self.input_cols)
         if is_test:
@@ -227,7 +227,7 @@ class CreateLoader:
 
         Returns:
           arr: distance matrix with dimensions
-            [1, sequence length, sequence length, 3]
+            [1, len_sequence, len_sequence, 3]
         '''
         idx = np.arange(leng)
         Ds = []
@@ -255,7 +255,7 @@ class CreateLoader:
 
         Returns:
           arr: list of adjacency matrices with dimensions
-            [number of samples, sequence length, sequence length, 1]
+            [no_samples, len_sequence, len_sequence, 1]
         '''
         Ss = []
         for i in range(len(loaded_data)):
