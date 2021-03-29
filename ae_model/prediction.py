@@ -16,7 +16,7 @@ class Loss:
         pass
 
     def MCRMSE(self, y_true, y_pred):
-        '''
+        """
         Generate mean columnwise root mean squared error.
 
         Args:
@@ -25,12 +25,12 @@ class Loss:
 
         Returns:
           float: mean columnwise root mean squared error
-        '''
+        """
         colwise_mse = torch.mean(torch.square(y_true - y_pred), dim=1)
         return torch.mean(torch.sqrt(colwise_mse), dim=1)
 
     def sn_mcrmse_loss(self, predict, target, signal_to_noise):
-        '''
+        """
         Generate signal-to-noise scaled mean columnwise root mean squared error.
 
         Args:
@@ -40,14 +40,14 @@ class Loss:
 
         Returns:
           float: signal-to-noise scaled mean columnwise root mean squared error
-        '''
+        """
         loss = self.MCRMSE(target, predict)
         weight = 0.5 * torch.log(signal_to_noise + 1.01)
         loss = (loss * weight).mean()
         return loss
 
     def learn_from_batch(self, model, data, optimizer, lr_scheduler, device):
-        '''
+        """
         Run training on batch.
 
         Args:
@@ -60,7 +60,7 @@ class Loss:
         Returns:
           arr: predicted values
           float: loss value
-        '''
+        """
         optimizer.zero_grad()
         out = model(data["sequence"].to(device), data["bpp"].to(device))
         signal_to_noise = data["signal_to_noise"] * data["score"]
@@ -74,7 +74,7 @@ class Loss:
         return out, loss
 
     def evaluate(self, model, valid_data, device):
-        '''
+        """
         Run validation.
 
         Args:
@@ -84,7 +84,7 @@ class Loss:
 
         Returns:
           dict: mean loss value, mean of mean columnwise root mean squared error
-        '''
+        """
         model.eval()
         loss_list = []
         mcrmse = []
@@ -104,7 +104,7 @@ class Predict:
         pass
 
     def predict_batch(self, model, data, device, target_cols):
-        '''
+        """
         Run prediction on batch.
 
         Args:
@@ -115,7 +115,7 @@ class Predict:
 
         Returns:
           arr: list of dict of target features and their corresponding predictions
-        '''
+        """
         with torch.no_grad():
             pred = model(data["sequence"].to(device), data["bpp"].to(device))
             pred = pred.detach().cpu().numpy()
@@ -132,7 +132,7 @@ class Predict:
         return return_values
 
     def predict_data(self, model, loader, device, batch_size, target_cols):
-        '''
+        """
         Run prediction.
 
         Args:
@@ -144,7 +144,7 @@ class Predict:
 
         Returns:
           arr: list of batches of dict of target features and their corresponding predictions
-        '''
+        """
         data_list = []
         for i, data in enumerate(progress_bar(loader)):
             data_list += self.predict_batch(model, data, device, target_cols)
