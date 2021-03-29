@@ -18,7 +18,7 @@ torch.manual_seed(42)
 
 class Conv1dStack(nn.Module):
     def __init__(self, in_dim, out_dim, kernel_size=3, padding=1, dilation=1):
-        '''
+        """
         Load model parameters for 1D convolution stacks.
 
         Args:
@@ -31,7 +31,7 @@ class Conv1dStack(nn.Module):
         Attributes:
           conv (obj): first 1D convolution block
           res (obj): second 1D convolution residual block
-        '''
+        """
         super(Conv1dStack, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv1d(in_dim, out_dim, kernel_size=kernel_size, padding=padding, dilation=dilation, bias=False),
@@ -47,7 +47,7 @@ class Conv1dStack(nn.Module):
         )
 
     def forward(self, x):
-        '''
+        """
         Run forward pass.
 
         Args:
@@ -55,7 +55,7 @@ class Conv1dStack(nn.Module):
 
         Returns:
           arr: output data
-        '''
+        """
         x = self.conv(x)
         h = self.res(x)
         return x + h
@@ -63,7 +63,7 @@ class Conv1dStack(nn.Module):
 
 class Conv2dStack(nn.Module):
     def __init__(self, in_dim, out_dim, kernel_size=3, padding=1, dilation=1):
-        '''
+        """
         Load model parameters for 2D convolution stacks.
 
         Args:
@@ -76,7 +76,7 @@ class Conv2dStack(nn.Module):
         Attributes:
           conv (obj): first 2D convolution block
           res (obj): second 2D convolution residual block
-        '''
+        """
         super(Conv2dStack, self).__init__()
         self.conv = nn.Sequential(
             nn.Conv2d(in_dim, out_dim, kernel_size=kernel_size, padding=padding, dilation=dilation, bias=False),
@@ -92,7 +92,7 @@ class Conv2dStack(nn.Module):
         )
 
     def forward(self, x):
-        '''
+        """
         Run forward pass.
 
         Args:
@@ -100,7 +100,7 @@ class Conv2dStack(nn.Module):
 
         Returns:
           arr: output data
-        '''
+        """
         x = self.conv(x)
         h = self.res(x)
         return x + h
@@ -108,7 +108,7 @@ class Conv2dStack(nn.Module):
 
 class SeqEncoder(nn.Module):
     def __init__(self, config_path, in_dim: int):
-        '''
+        """
         Load model parameters for sequence encoder.
 
         Args:
@@ -120,7 +120,7 @@ class SeqEncoder(nn.Module):
           conv1 (obj): second stacked convolution block
           conv2 (obj): third stacked convolution block
           conv3 (obj): fourth stacked convolution block
-        '''
+        """
         super(SeqEncoder, self).__init__()
         cfg = Config(config_path)
         self.conv0 = Conv1dStack(in_dim, cfg.units1, cfg.kernel_size1, padding=cfg.padding1)
@@ -129,7 +129,7 @@ class SeqEncoder(nn.Module):
         self.conv3 = Conv1dStack(cfg.units3, cfg.units4, cfg.kernel_size4, padding=cfg.padding4, dilation=cfg.dilation4)
 
     def forward(self, x):
-        '''
+        """
         Run forward pass.
 
         Args:
@@ -137,7 +137,7 @@ class SeqEncoder(nn.Module):
 
         Returns:
           arr: output data
-        '''
+        """
         x1 = self.conv0(x)
         x2 = self.conv1(x1)
         x3 = self.conv2(x2)
@@ -148,7 +148,7 @@ class SeqEncoder(nn.Module):
 
 class BppAttn(nn.Module):
     def __init__(self, in_channel: int, out_channel: int):
-        '''
+        """
         Load parameters for generating attention filter on sequence of base-pairing probabilities.
 
         Args:
@@ -158,13 +158,13 @@ class BppAttn(nn.Module):
         Attributes:
           conv0 (obj): 1D stacked convolution block
           bpp_conv (obj): 2D stacked convolution stacked block
-        '''
+        """
         super(BppAttn, self).__init__()
         self.conv0 = Conv1dStack(in_channel, out_channel, 3, padding=1)
         self.bpp_conv = Conv2dStack(5, out_channel)
 
     def forward(self, x, bpp):
-        '''
+        """
         Run forward pass.
 
         Args:
@@ -174,7 +174,7 @@ class BppAttn(nn.Module):
 
         Returns:
           arr: output data
-        '''
+        """
         x = self.conv0(x)
         bpp = self.bpp_conv(bpp)
         x = torch.matmul(bpp, x.unsqueeze(-1))
@@ -183,7 +183,7 @@ class BppAttn(nn.Module):
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, dropout=0.1, max_len=5000):
-        '''
+        """
         Load parameters for positional encoding.
 
         Args:
@@ -194,7 +194,7 @@ class PositionalEncoding(nn.Module):
         Attributes:
           dropout (obj): dropout layer
           register_buffer (obj): register positional encoding matrix as a non-parameter
-        '''
+        """
         super(PositionalEncoding, self).__init__()
         self.dropout = nn.Dropout(p=dropout)
 
@@ -207,7 +207,7 @@ class PositionalEncoding(nn.Module):
         self.register_buffer('pe', pe)
 
     def forward(self, x):
-        '''
+        """
         Run forward pass.
 
         Args:
@@ -215,14 +215,14 @@ class PositionalEncoding(nn.Module):
 
         Returns:
           arr: output data
-        '''
+        """
         x = x + self.pe[:x.size(0), :]
         return self.dropout(x)
 
 
 class TransformerWrapper(nn.Module):
     def __init__(self, dmodel=256, nhead=8, num_layers=2):
-        '''
+        """
         Load model parameters for both transformer and positional encoding blocks.
 
         Args:
@@ -233,7 +233,7 @@ class TransformerWrapper(nn.Module):
         Attributes:
           transformer_encoder (obj): transformer encoder block
           pos_emb (obj): positional encoder block
-        '''
+        """
         super(TransformerWrapper, self).__init__()
         encoder_layer = TransformerEncoderLayer(d_model=dmodel, nhead=nhead)
         self.transformer_encoder = TransformerEncoder(encoder_layer, num_layers)
@@ -243,7 +243,7 @@ class TransformerWrapper(nn.Module):
         pass
 
     def forward(self, x):
-        '''
+        """
         Run forward pass.
 
         Args:
@@ -252,7 +252,7 @@ class TransformerWrapper(nn.Module):
         Returns:
           arr: output data
           None
-        '''
+        """
         x = x.permute((1, 0, 2)).contiguous()
         x = self.pos_emb(x)
         x = self.transformer_encoder(x)
@@ -262,7 +262,7 @@ class TransformerWrapper(nn.Module):
 
 class RnnLayers(nn.Module):
     def __init__(self, dmodel, dropout=0.3, transformer_layers: int = 2):
-        '''
+        """
         Load model parameters for RNN layers.
 
         Args:
@@ -275,7 +275,7 @@ class RnnLayers(nn.Module):
           rnn0 (obj): transformer block
           rnn1 (obj): LSTM block
           rnn2 (obj): GRU block
-        '''
+        """
         super(RnnLayers, self).__init__()
         self.dropout = nn.Dropout(dropout)
         self.rnn0 = TransformerWrapper(dmodel, nhead=8, num_layers=transformer_layers)
@@ -283,7 +283,7 @@ class RnnLayers(nn.Module):
         self.rnn2 = nn.GRU(dmodel, dmodel // 2, batch_first=True, num_layers=1, bidirectional=True)
 
     def forward(self, x):
-        '''
+        """
         Run forward pass.
 
         Args:
@@ -291,7 +291,7 @@ class RnnLayers(nn.Module):
 
         Returns:
           arr: output data
-        '''
+        """
         self.rnn0.flatten_parameters()
         x, _ = self.rnn0(x)
         if self.rnn1 is not None:
@@ -307,7 +307,7 @@ class RnnLayers(nn.Module):
 
 class BaseAttnModel(nn.Module):
     def __init__(self, config_path='', transformer_layers: int = 2):
-        '''
+        """
         Load parameters for base attention model.
 
         Args:
@@ -322,7 +322,7 @@ class BaseAttnModel(nn.Module):
           seq (obj): RNN layers
           bpp_nb_mean (float): mean number of non-zero base-pairing probabilities
           bpp_nb_std (float): standard deviation of number of non-zero base-pairing probabilities
-        '''
+        """
         super(BaseAttnModel, self).__init__()
         self.linear0 = nn.Linear(14 + 3, 1)
         self.seq_encoder_x = SeqEncoder(config_path, 18)
@@ -334,7 +334,7 @@ class BaseAttnModel(nn.Module):
         self.bpp_nb_std = 0.08914
 
     def get_bpp_feature(self, bpp):
-        '''
+        """
         Generate general statistics of base-pairing probabilities in a sequence.
 
         Args:
@@ -345,7 +345,7 @@ class BaseAttnModel(nn.Module):
           arr: [maximum base-pairing probabilities,
             sum of base-pairing probabilities,
             normalized number of non-zero base-pairing probabilities]
-        '''
+        """
         bpp_max = bpp.max(-1)[0]
         bpp_sum = bpp.sum(-1)
         bpp_nb = torch.true_divide((bpp > 0).sum(dim=1), bpp.shape[1])
@@ -353,7 +353,7 @@ class BaseAttnModel(nn.Module):
         return [bpp_max.unsqueeze(2), bpp_sum.unsqueeze(2), bpp_nb.unsqueeze(2)]
 
     def forward(self, x, bpp):
-        '''
+        """
         Run forward pass.
 
         Args:
@@ -363,7 +363,7 @@ class BaseAttnModel(nn.Module):
 
         Returns:
           arr: output data
-        '''
+        """
         bpp_features = self.get_bpp_feature(bpp[:, :, :, 0].float())
         x = torch.cat([x] + bpp_features, dim=-1)
         learned = self.linear0(x)
@@ -382,7 +382,7 @@ class BaseAttnModel(nn.Module):
 
 class AEModel(nn.Module):
     def __init__(self, config_path='', transformer_layers: int = 2):
-        '''
+        """
         Load parameters for full model.
 
         Args:
@@ -392,7 +392,7 @@ class AEModel(nn.Module):
         Attributes:
           seq (obj): base attention model
           linear (obj): linear layer with activation function
-        '''
+        """
         super(AEModel, self).__init__()
         self.seq = BaseAttnModel(config_path=config_path, transformer_layers=transformer_layers)
         self.linear = nn.Sequential(
@@ -401,7 +401,7 @@ class AEModel(nn.Module):
         )
 
     def forward(self, x, bpp):
-        '''
+        """
         Run forward pass.
 
         Args:
@@ -411,7 +411,7 @@ class AEModel(nn.Module):
 
         Returns:
           arr: output data
-        '''
+        """
         x = self.seq(x, bpp)
         x = F.dropout(x, p=0.3)
         x = self.linear(x)
@@ -420,7 +420,7 @@ class AEModel(nn.Module):
 
 class FromAeModel(nn.Module):
     def __init__(self, seq, pred_len=68, dmodel: int = 256):
-        '''
+        """
         Load parameters for full model.
 
         Args:
@@ -432,7 +432,7 @@ class FromAeModel(nn.Module):
           seq (obj): model
           pred_len (int): prediction length
           linear (obj): linear layer
-        '''
+        """
         super(FromAeModel, self).__init__()
         self.seq = seq
         self.pred_len = pred_len
@@ -441,7 +441,7 @@ class FromAeModel(nn.Module):
         )
 
     def forward(self, x, bpp):
-        '''
+        """
         Run forward pass.
 
         Args:
@@ -451,7 +451,7 @@ class FromAeModel(nn.Module):
 
         Returns:
           arr: output data
-        '''
+        """
         x = self.seq(x, bpp)
         x = self.linear(x)
         x = x[:, :self.pred_len]
@@ -459,7 +459,7 @@ class FromAeModel(nn.Module):
 
 class TrainAE:
     def __init__(self, model):
-        '''
+        """
         Load parameters for full model, learning rate scheduler and optimizer.
 
         Args:
@@ -469,13 +469,13 @@ class TrainAE:
           model (obj): model
           lr_scheduler (obj): learning rate scheduler
           optimizer (obj): optimizer
-        '''
+        """
         self.model = model
         self.lr_scheduler = None
         self.optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
 
     def learn_from_batch_ae(self, data, device):
-        '''
+        """
         Generate loss value.
 
         Args:
@@ -484,7 +484,7 @@ class TrainAE:
 
         Returns:
           loss (float): loss value
-        '''
+        """
         seq = data["sequence"].clone()
         seq[:, :, :14] = F.dropout2d(seq[:, :, :14], p=0.3)
         target = data["sequence"][:, :, :14]
@@ -495,7 +495,7 @@ class TrainAE:
 
     def train_ae(self, train_data, epochs=10, device="cpu", start_epoch: int = 0, start_it: int = 0,
                  MODEL_SAVE_PATH = './model'):
-        '''
+        """
         Run model.
 
         Args:
@@ -509,7 +509,7 @@ class TrainAE:
         Returns:
           dict: index of ending epoch, index of ending sample from input data,
             index of epoch with minimum loss value
-        '''
+        """
         print(f"device: {device}")
         losses = []
         it = start_it
