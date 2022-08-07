@@ -4,8 +4,6 @@
 
 The repository contains a [Transformer](https://en.wikipedia.org/wiki/Transformer_(machine_learning_model))-based solution to the [OpenVaccine: COVID-19 mRNA Vaccine Degradation Prediction Competition](https://www.kaggle.com/c/stanford-covid-vaccine) held on Kaggle between September 11 and October 7, 2020. Check out my [profile](https://www.kaggle.com/mwong007)!
 
-![image](https://github.com/mingjiewong/Kaggle-Covid-2020/blob/master/Figure1.png)
-
 ## Getting Started
 
 Clone the repo:
